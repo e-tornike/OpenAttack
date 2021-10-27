@@ -19,7 +19,7 @@ class PunctTokenizer(Tokenizer):
     """
 
 
-    TAGS = { TAG_English }
+    TAGS = { TAG_English, TAG_German }
 
     def __init__(self) -> None:
         self.sent_tokenizer = DataManager.load("TProcess.NLTKSentTokenizer")

@@ -1,6 +1,7 @@
 import sys
 from typing import Any, Dict, Generator, Iterable, List, Optional, Union
 import logging
+import numpy as np
 from tqdm import tqdm
 from ..utils import visualizer, result_visualizer, get_language, language_by_name
 from .utils import worker_process, worker_init, attack_process
@@ -174,6 +175,7 @@ class AttackEval:
         total_result_cnt = {}
         total_inst = 0
         success_inst = 0
+        output_data = []
 
         # Begin for
         for i, res in enumerate(result_iterator):
@@ -192,6 +194,18 @@ class AttackEval:
                             self.victim.clear_context()
                         y_orig = probs[0]
                         y_adv = probs[1]
+                        output_data.append({
+                            "x_orig": str(x_orig), 
+                            "y_orig": {
+                                "prob": float(y_orig[np.argmax(y_orig)]), 
+                                "label": int(np.argmax(y_orig))
+                            }, 
+                            "x_adv": str(x_adv), 
+                            "y_adv": {
+                                "prob": float(y_adv[np.argmax(y_adv)]), 
+                                "label": int(np.argmax(y_adv))
+                            }
+                        })
                     elif Tag("get_pred", "victim") in self.victim.TAGS:
                         self.victim.set_context(res["data"], None)
                         try:
@@ -200,6 +214,20 @@ class AttackEval:
                             self.victim.clear_context()
                         y_orig = int(preds[0])
                         y_adv = int(preds[1])
+                        output_data.append({
+                            "x_orig": str(x_orig), 
+                            "y_orig": {
+                                "prob": float(y_orig[np.argmax(y_orig)]), 
+                                "label": int(np.argmax(y_orig))
+                            }, 
+                            "x_adv": str(x_adv), 
+                            "y_adv": {
+                                "prob": float(y_adv[np.argmax(y_adv)]), 
+                                "label": int(np.argmax(y_adv))
+                            }
+                        })
+                        # output_data.append({"x_orig": str(x_orig), "y_orig": {"prob": float(y_orig[np.argmax(y_orig)]), "label": int(np.argmax(y_orig))}, "x_adv": str(x_adv), "y_adv": float({"prob": float(y_adv[np.argmax(y_adv)]), "label": int(np.argmax(y_adv))})})
+                        # output_data.append({"x_orig": str(x_orig), "y_orig": y_orig, "x_adv": str(x_adv), "y_adv": y_adv})
                     else:
                         raise RuntimeError("Invalid victim model")
                 else:
@@ -212,6 +240,8 @@ class AttackEval:
                         finally:
                             self.victim.clear_context()
                         y_orig = probs[0]
+                        output_data.append({"x_orig": str(x_orig), "y_orig": {"prob": float(y_orig[np.argmax(y_orig)]), "label": int(np.argmax(y_orig))}})
+                        # output_data.append({"x_orig": x_orig, "y_orig": y_orig})
                     elif Tag("get_pred", "victim") in self.victim.TAGS:
                         self.victim.set_context(res["data"], None)
                         try:
@@ -219,6 +249,8 @@ class AttackEval:
                         finally:
                             self.victim.clear_context()
                         y_orig = int(preds[0])
+                        output_data.append({"x_orig": str(x_orig), "y_orig": {"prob": float(y_orig[np.argmax(y_orig)]), "label": int(np.argmax(y_orig))}})
+                        # output_data.append({"x_orig": x_orig, "y_orig": y_orig})
                     else:
                         raise RuntimeError("Invalid victim model")
                 info = res["metrics"]
@@ -252,7 +284,7 @@ class AttackEval:
         
         if visualize:
             result_visualizer(summary, sys.stdout.write)
-        return summary
+        return summary, output_data
     
     ## TODO generate adversarial samples
     

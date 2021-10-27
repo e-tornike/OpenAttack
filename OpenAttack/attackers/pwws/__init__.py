@@ -68,7 +68,8 @@ class PWWSAttacker(ClassificationAttacker):
         self.filter_words = set(filter_words)
         
     def attack(self, victim: Classifier, sentence : str, goal : ClassifierGoal):
-        x_orig = sentence.lower()
+        # x_orig = sentence.lower()
+        x_orig = sentence
 
 
         x_orig = self.tokenizer.tokenize(x_orig)

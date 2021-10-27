@@ -4,8 +4,8 @@ from .punct_tokenizer import PunctTokenizer
 from .transformers_tokenizer import TransformersTokenizer
 
 def get_default_tokenizer(lang):
-    from ...tags import TAG_English, TAG_Chinese
-    if lang == TAG_English:
+    from ...tags import TAG_English, TAG_Chinese, TAG_German
+    if lang == TAG_English or lang == TAG_German:
         return PunctTokenizer()
     if lang == TAG_Chinese:
         return JiebaTokenizer()

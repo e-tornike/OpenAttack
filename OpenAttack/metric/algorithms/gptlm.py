@@ -8,18 +8,19 @@ class GPT2LM(AttackMetric):
     NAME = "Fluency (ppl)"
     TAGS = { TAG_English }
 
-    def __init__(self):
+    def __init__(self, lang = "english"):
         """
         Language Models are Unsupervised Multitask Learners.
         `[pdf] <https://d4mucfpksywv.cloudfront.net/better-language-models/language-models.pdf>`__
         `[code] <https://github.com/openai/gpt-2>`__
 
-        :Language: english
+        :Language: english or german
         
         """
+        model_name = "dbmdz/german-gpt2" if lang == "german" else "gpt2"
 
-        self.tokenizer = transformers.GPT2TokenizerFast.from_pretrained("gpt2")
-        self.lm = transformers.GPT2LMHeadModel.from_pretrained("gpt2")
+        self.tokenizer = transformers.GPT2TokenizerFast.from_pretrained(model_name)
+        self.lm = transformers.GPT2LMHeadModel.from_pretrained(model_name)
     
     def after_attack(self, input, adversarial_sample):
         if adversarial_sample is not None:

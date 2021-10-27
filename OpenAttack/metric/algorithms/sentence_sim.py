@@ -4,18 +4,22 @@ from ...tags import *
 class SentenceSim(AttackMetric):
     
     NAME = "Sentence Similarity"
-    TAGS = { TAG_English } 
+    TAGS = { TAG_English , TAG_German } 
 
-    def __init__(self):
+    def __init__(self, lang = "english"):
         """
         :Pakcage Requirements:
             * sentence_transformers
-        :Language: english
+        :Language: english or german
 
         """
         from sentence_transformers import SentenceTransformer
-        from ..data_manager import DataManager
-        self.model = SentenceTransformer(DataManager.load("AttackAssist.SentenceTransformer"), device='cuda')
+        from ...data_manager import DataManager
+
+        if lang == "german":
+            self.model = SentenceTransformer("T-Systems-onsite/german-roberta-sentence-transformer-v2", device='cuda')
+        else:
+            self.model = SentenceTransformer(DataManager.load("AttackAssist.SentenceTransformer"), device='cuda')
 
     def calc_score(self, sen1 : str, sen2 : str) -> float:
         """
